@@ -7,13 +7,11 @@
   </style>
 {% endblock %}
 {% block content %}
-  <h1>Login</h1>
-  <p class="important">
-    This is where you login
-  </p>    
+
   <div class="container">
         <div class="row">
             <div class="col-md-4 col-md-offset-4">
+                <h1 style='margin: 50px;'>Login</h1>
                 <form method=POST action="{{ url_for('login') }}">
                     <div class="form-group">
                         <label for="exampleInputEmail1">Username</label>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, request, session, redirect
+from flask import Flask, flash, render_template, url_for, request, session, redirect
 # from flask_login import LoginManager, UserMixin
 from flask_pymongo import PyMongo
 import bcrypt
@@ -17,34 +17,46 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method =='POST':
-        users = mongo.db.users
-        existing_user = users.find_one({'name' : request.form['username']})
+    if session:
+        return redirect(url_for('index'))
+    
+    else:
+        if request.method =='POST':
+            users = mongo.db.users
+            existing_user = users.find_one({'name' : request.form['username']})
 
-        if existing_user:
-            if bcrypt.hashpw(request.form['pass'].encode('utf-8'), existing_user['password']) == existing_user['password']:
-                session['username'] = request.form['username']
-                return redirect(url_for('index'))
-            return 'invalid username/passwd combination'
-        return 'invalid username'
+            if existing_user:
+                if bcrypt.hashpw(request.form['pass'].encode('utf-8'), existing_user['password']) == existing_user['password']:
+                    session['username'] = request.form['username']
+                    return redirect(url_for('index'))
+                flash('invalid username/passwd combination')
+                return redirect(url_for('login'))
+            flash('invalid username')
+            return redirect(url_for('login'))
 
-    return render_template('login.html')
+        return render_template('login.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    if request.method == 'POST':
-        users = mongo.db.users
-        existing_user = users.find_one({'name' : request.form['username']})
-        
-        if existing_user is None:
-            hashpass = bcrypt.hashpw(request.form['pass'].encode('utf-8'), bcrypt.gensalt())
-            users.insert({'name' : request.form['username'], 'password' : hashpass})
-            session['username'] = request.form['username']
-            return redirect(url_for('index'))
-        
-        return 'that username already exists'
+    if session:
+        return redirect(url_for('index'))
+    else:    
+        if request.method == 'POST':
+            users = mongo.db.users
+            existing_user = users.find_one({'name' : request.form['username']})
+            
+            if existing_user is None:
+                email=request.form['email']
+                hashpass = bcrypt.hashpw(request.form['pass'].encode('utf-8'), bcrypt.gensalt())
+                users.insert({'name' : request.form['username'], 'password' : hashpass, 'email' : email})
+                session['username'] = request.form['username']
+                session['email'] = request.form['email']
+                return redirect(url_for('index'))
+            
+            flash('that username already exists')
+            return redirect(url_for('signup'))
 
-    return render_template('signup.html')
+        return render_template('signup.html')
 
 @app.route('/signout')
 def signout():

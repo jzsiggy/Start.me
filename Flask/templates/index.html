@@ -7,10 +7,17 @@
   </style>
 {% endblock %}
 {% block content %}
-  <h1>Index</h1>
-  {% if 'username' in session: %}
-  <p>
-      you are logged in as {{ session['username'] }}
-  </p>
-  {% endif %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <h1 style='margin:50px;'>Index</h1>
+            {% if 'username' in session: %}
+            <p>
+                you are logged in as {{ session['username'] }}
+                your email is {{ session['email'] }}
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}
