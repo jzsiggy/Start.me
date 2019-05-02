@@ -1,0 +1,13 @@
+.navbar {
+    height: 50px;
+}
+
+.nav-elements {
+    display: flex;
+    position: absolute;
+    list-style: none;
+}
+
+.nav-link {
+    padding-left: 60px;
+}

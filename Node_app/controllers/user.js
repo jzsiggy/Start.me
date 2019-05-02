@@ -95,7 +95,10 @@ exports.postSignup = (req, res, next) => {
 
   const user = new User({
     email: req.body.email,
-    password: req.body.password
+    password: req.body.password,
+    name: req.body.name,
+    description: req.body.description,
+    type: req.body.type,
   });
 
   User.findOne({ email: req.body.email }, (err, existingUser) => {
@@ -144,10 +147,12 @@ exports.postUpdateProfile = (req, res, next) => {
   User.findById(req.user.id, (err, user) => {
     if (err) { return next(err); }
     user.email = req.body.email || '';
-    user.profile.name = req.body.name || '';
+    user.name = req.body.name || '';
     user.profile.gender = req.body.gender || '';
     user.profile.location = req.body.location || '';
     user.profile.website = req.body.website || '';
+    user.type = req.body.type || '';
+    user.description = req.body.description || '';
     user.save((err) => {
       if (err) {
         if (err.code === 11000) {
