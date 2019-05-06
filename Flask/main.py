@@ -3,9 +3,10 @@ from flask import Flask, flash, render_template, url_for, request, session, redi
 from flask_pymongo import PyMongo
 import bcrypt
 from flask_bootstrap import Bootstrap
+import os
 
 app = Flask(__name__)
-app.secret_key = 'startme'
+app.secret_key = os.urandom(24)
 app.config["MONGO_URI"] = "mongodb://localhost:27017/users"
 mongo = PyMongo(app)
 bootstrap = Bootstrap(app)
@@ -13,7 +14,9 @@ bootstrap = Bootstrap(app)
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    startups = mongo.db.users.find({'StudentOrStartup' : 'Startup'})
+    students = mongo.db.users.find({'StudentOrStartup' : 'Student'})
+    return render_template('index.html', startups=startups, students=students)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -28,11 +31,13 @@ def login():
             if existing_user:
                 if bcrypt.hashpw(request.form['pass'].encode('utf-8'), existing_user['password']) == existing_user['password']:
                     session['username'] = request.form['username']
+                    session['email'] = existing_user['email']
+                    session['StudentOrStartup'] = existing_user['StudentOrStartup']
                     return redirect(url_for('index'))
                 flash('invalid username/passwd combination')
-                return redirect(url_for('login'))
+                # return redirect(url_for('login'))
             flash('invalid username')
-            return redirect(url_for('login'))
+            # return redirect(url_for('login'))
 
         return render_template('login.html')
 
@@ -47,10 +52,12 @@ def signup():
             
             if existing_user is None:
                 email=request.form['email']
+                StudentOrStartup=request.form['StudentOrStartup']
                 hashpass = bcrypt.hashpw(request.form['pass'].encode('utf-8'), bcrypt.gensalt())
-                users.insert({'name' : request.form['username'], 'password' : hashpass, 'email' : email})
+                users.insert({'name' : request.form['username'], 'password' : hashpass, 'email' : email, 'StudentOrStartup' : StudentOrStartup})
                 session['username'] = request.form['username']
                 session['email'] = request.form['email']
+                session['StudentOrStartup'] = request.form['StudentOrStartup']
                 return redirect(url_for('index'))
             
             flash('that username already exists')
@@ -63,6 +70,14 @@ def signout():
     if session:
         session.clear()
     return redirect(url_for('index'))
+
+@app.route('/account', methods=['GET', 'POST'])
+def account():
+    if request.method == 'GET':
+        return render_template('account.html')
+    if request.mmethod == 'POST':
+        pass
+
 
 
 if __name__ == '__main__':
