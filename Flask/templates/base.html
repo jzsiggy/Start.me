@@ -12,8 +12,9 @@
         <ul class='nav-elements'>
             {% if 'username' in session: %}  
             <li class='nav-link'><a href='/'>Home</a></li>
-            <!-- <li class='nav-link'><a href='/login'>Login</a></li>
-            <li class='nav-link'><a href='/signup'>Sign Up</a></li> -->
+            <!-- <li class='nav-link'><a href='/login'>Login</a></li> -->
+            <!-- <li class='nav-link'><a href='/signup'>Sign Up</a></li> -->
+            <li class='nav-link'><a href='/account'>My Account</a></li>
             <li class='nav-link'><a href='/signout'>Sign Out</a></li>
             {% else: %}
             <li class='nav-link'><a href='/'>Home</a></li>
@@ -36,7 +37,7 @@
       {% endwith %}
     </div>
     <div id="content">{% block content %}{% endblock %}</div>
-    <div id="footer">
+    <div id="footer" class="footer" style='text-align: center;'>
       {% block footer %}
       &copy; Copyright 2019 by <a href="http://domain.invalid/">you</a>.
       {% endblock %}
