@@ -12,11 +12,24 @@ mongo = PyMongo(app)
 bootstrap = Bootstrap(app)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index():
     startups = mongo.db.users.find({'StudentOrStartup' : 'Startup'})
     students = mongo.db.users.find({'StudentOrStartup' : 'Student'})
     return render_template('index.html', startups=startups, students=students)
+
+
+@app.route('/like', methods=['POST']) 
+def like():
+    if session:
+        update = mongo.db.users.update
+        user = mongo.db.users.find_one({'name' : session['username']})
+        # if 'likes' not in user:
+        update({'name': session['username']}, {'$set': { 'likes' : 'Likey'}})
+        session['likes'] = user['likes']
+    return redirect(url_for('index'))
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -40,6 +53,7 @@ def login():
             # return redirect(url_for('login'))
 
         return render_template('login.html')
+
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -65,11 +79,13 @@ def signup():
 
         return render_template('signup.html')
 
+
 @app.route('/signout')
 def signout():
     if session:
         session.clear()
     return redirect(url_for('index'))
+
 
 @app.route('/account', methods=['GET', 'POST'])
 def account():
@@ -81,4 +97,4 @@ def account():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8080)
